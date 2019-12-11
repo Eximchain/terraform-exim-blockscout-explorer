@@ -33,6 +33,13 @@ resource "aws_ssm_parameter" "db_password" {
   type  = "String"
 }
 
+resource "aws_ssm_parameter" "elixir_version" {
+  count = length(var.chains)
+  name  = "/${var.prefix}/${element(var.chains, count.index)}/elixir_version"
+  value = var.chain_elixir_version[element(var.chains, count.index)]
+  type  = "String"
+}
+
 resource "aws_db_instance" "default" {
   count                  = length(var.chains)
   name                   = var.chain_db_name[element(var.chains, count.index)]

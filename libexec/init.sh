@@ -189,6 +189,25 @@ old_env="$(cat /etc/environment)"
     echo "LANGUAGE=en_US"
     echo "LC_ALL=en_US.UTF-8"
     echo "LC_CTYPE=en_US.UTF-8"
+    echo "NETWORK=Eximchain"
+    echo "SUBNETWORK=\"Main Network\""
+    echo "ETHEREUM_JSONRPC_VARIANT=geth"
+    echo "ETHEREUM_JSONRPC_HTTP_URL=\"http://tx-executor-us-east.eximchain.com\"" # TODO: Make variable
+    echo "ETHEREUM_JSONRPC_TRACE_URL=\"http://tx-executor-us-east.eximchain.com\""
+    echo "LOGO=\"/images/blockscout_logo.svg\"" # TODO: Eximchain Logo
+    echo "EXIM_PATH=\"/exim/main\""
+    echo "SECRET_KEY_BASE=\"TPGMvGK0iIwlXBQuQDA5KRqk77VETbEBlG4gAWeb93TvBsYAjvoAvdODMd6ZeguPwf2YTRY3n7uvxXzQP4WayQ==\"" # TODO: Generate own secret
+    echo "PORT=4000"
+    echo "POOL_SIZE=20"
+    echo "HEARTBEAT_TIMEOUT=60"
+    echo "HEART_COMMAND=\"sudo systemctl restart explorer.service\""
+    echo "BLOCKSCOUT_VERSION=\"v2.0.0-beta\""
+    echo "BLOCK_TRANSFORMER=base"
+    echo "TXS_COUNT_CACHE_PERIOD=7200"
+    echo "ADDRESS_WITH_BALANCES_UPDATE_INTERVAL=1800"
+    echo "FIRST_BLOCK=0"
+    echo "SUPPORTED_CHAINS='[{ \"title\": \"Eximchain Main Network\", \"url\": \"https://blockscout.com/exim/main\" }]'"
+
 } > /etc/environment
 
 log "Parameters have been written to /etc/environment successfully!"
@@ -220,9 +239,14 @@ log "Installing gcc for NIF compilation during code deploy"
 
 yum install -y --enablerepo=epel gcc  >"$LOG"
 
+log "Installing polkit"
+
+yum install -y polkit > "$LOG"
+
 log "Application environment is ready!"
 
 log "Starting CodeDeploy agent.."
 service codedeploy-agent start >"$LOG"
 
+log "user-data script completed successfully"
 exit 0

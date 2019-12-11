@@ -90,6 +90,10 @@ variable "chain_db_version" {
   default = {}
 }
 
+variable "chain_elixir_version" {
+  default = {}
+}
+
 variable "secret_key_base" {
   default = {}
 }
