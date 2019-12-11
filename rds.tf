@@ -40,6 +40,20 @@ resource "aws_ssm_parameter" "elixir_version" {
   type  = "String"
 }
 
+resource "aws_ssm_parameter" "secret_key_base" {
+  count = length(var.chains)
+  name  = "/${var.prefix}/${element(var.chains, count.index)}/secret_key_base"
+  value = var.secret_key_base[element(var.chains, count.index)]
+  type  = "String"
+}
+
+resource "aws_ssm_parameter" "jsonrpc_url" {
+  count = length(var.chains)
+  name  = "/${var.prefix}/${element(var.chains, count.index)}/jsonrpc_url"
+  value = var.chain_jsonrpc_url[element(var.chains, count.index)]
+  type  = "String"
+}
+
 resource "aws_db_instance" "default" {
   count                  = length(var.chains)
   name                   = var.chain_db_name[element(var.chains, count.index)]

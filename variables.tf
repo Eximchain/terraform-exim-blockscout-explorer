@@ -110,3 +110,6 @@ variable "use_ssl" {
   default = {}
 }
 
+variable "chain_jsonrpc_url" {
+  default = {}
+}

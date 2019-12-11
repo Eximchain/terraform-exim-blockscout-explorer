@@ -172,6 +172,9 @@ DB_PORT="$(get_param 'db_port')"
 DB_NAME="$(get_param 'db_name')"
 DATABASE_URL="postgresql://$DB_USER:$DB_PASS@$DB_HOST:$DB_PORT"
 
+SECRET_KEY_BASE="$(get_param 'secret_key_base')"
+JSONRPC_URL="$(get_param 'jsonrpc_url')"
+
 # Need to map the Parameter Store response to a set of NAME="<value>" entries,
 # one per line, which will then be written to /etc/environment so that they are
 # set for all users on the system
@@ -192,11 +195,11 @@ old_env="$(cat /etc/environment)"
     echo "NETWORK=Eximchain"
     echo "SUBNETWORK=\"Main Network\""
     echo "ETHEREUM_JSONRPC_VARIANT=geth"
-    echo "ETHEREUM_JSONRPC_HTTP_URL=\"http://tx-executor-us-east.eximchain.com\"" # TODO: Make variable
-    echo "ETHEREUM_JSONRPC_TRACE_URL=\"http://tx-executor-us-east.eximchain.com\""
+    echo "ETHEREUM_JSONRPC_HTTP_URL=\"$JSONRPC_URL\""
+    echo "ETHEREUM_JSONRPC_TRACE_URL=\"$JSONRPC_URL\""
     echo "LOGO=\"/images/blockscout_logo.svg\"" # TODO: Eximchain Logo
     echo "EXIM_PATH=\"/exim/main\""
-    echo "SECRET_KEY_BASE=\"TPGMvGK0iIwlXBQuQDA5KRqk77VETbEBlG4gAWeb93TvBsYAjvoAvdODMd6ZeguPwf2YTRY3n7uvxXzQP4WayQ==\"" # TODO: Generate own secret
+    echo "SECRET_KEY_BASE=\"$SECRET_KEY_BASE\"" # Secret key for production assets protection. Use `mix phx.gen.secret` or `openssl rand -base64 64 | tr -d '\n'` to generate
     echo "PORT=4000"
     echo "POOL_SIZE=20"
     echo "HEARTBEAT_TIMEOUT=60"

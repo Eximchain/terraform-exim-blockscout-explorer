@@ -69,6 +69,9 @@ resource "aws_autoscaling_group" "explorer" {
     aws_ssm_parameter.db_port,
     aws_ssm_parameter.db_username,
     aws_ssm_parameter.db_password,
+    aws_ssm_parameter.elixir_version,
+    aws_ssm_parameter.secret_key_base,
+    aws_ssm_parameter.jsonrpc_url,
     aws_placement_group.explorer
   ]
 
