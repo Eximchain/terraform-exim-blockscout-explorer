@@ -30,6 +30,10 @@ resource "aws_lb" "explorer" {
     prefix = var.prefix
     origin = "terraform"
   }
+
+  timeouts {
+    create = "15m"
+  }
 }
 
 # The Target Group for the ALB
