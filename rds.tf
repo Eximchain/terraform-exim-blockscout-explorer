@@ -47,10 +47,18 @@ resource "aws_ssm_parameter" "secret_key_base" {
   type  = "String"
 }
 
+locals {
+  # Should match the chain vars in variables
+  # Value from var takes precedence
+  chain_jsonrpc_url = merge({
+    exim = "http://${module.main_network_node.eximchain_node_dns}:${module.main_network_node.eximchain_node_rpc_port}"
+  }, var.chain_jsonrpc_url)
+}
+
 resource "aws_ssm_parameter" "jsonrpc_url" {
   count = length(var.chains)
   name  = "/${var.prefix}/${element(var.chains, count.index)}/jsonrpc_url"
-  value = var.chain_jsonrpc_url[element(var.chains, count.index)]
+  value = local.chain_jsonrpc_url[element(var.chains, count.index)]
   type  = "String"
 }
 
