@@ -1,3 +1,23 @@
+output "main_network_node_dns" {
+  value = module.main_network_node.eximchain_node_dns
+}
+
+output "main_network_lb_zone_id" {
+  value = module.main_network_node.eximchain_lb_zone_id
+}
+
+output "main_network_node_ssh_dns" {
+  value = module.main_network_node.eximchain_node_ssh_dns
+}
+
+output "main_network_node_rpc_port" {
+  value = module.main_network_node.eximchain_node_rpc_port
+}
+
+output "main_network_node_iam_role" {
+  value = module.main_network_node.eximchain_node_iam_role
+}
+
 output "instructions" {
   description = "Instructions for executing deployments"
 
