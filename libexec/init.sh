@@ -143,9 +143,9 @@ EOF
 
 log "Installing Erlang.."
 
-wget https://packages.erlang-solutions.com/erlang/rpm/centos/7/x86_64/esl-erlang_21.1-1~centos~7_amd64.rpm
+wget https://packages.erlang-solutions.com/erlang/rpm/centos/7/x86_64/esl-erlang_22.2.1-1~centos~7_amd64.rpm
 yum localinstall -y wxGTK-devel unixODBC-devel >"$LOG"
-yum localinstall -y esl-erlang_21.1-1~centos~7_amd64.rpm >"$LOG"
+yum localinstall -y esl-erlang_22.2.1-1~centos~7_amd64.rpm >"$LOG"
 
 log "Fetching configuration from Parameter Store..."
 fetch_ssm_with_token
