@@ -14,6 +14,16 @@ variable "aws_secret_key" {
   default = null
 }
 
+variable "public_key_path" {
+  description = "The path to the public key that will be used to SSH the instances in this region."
+  default     = ""
+}
+
+variable "public_key" {
+  description = "The public key that will be used to SSH the instances in this region. Will override public_key_path if set."
+  default     = ""
+}
+
 variable "prefix" {
 }
 

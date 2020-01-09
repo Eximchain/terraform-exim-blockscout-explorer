@@ -18,7 +18,7 @@ resource "aws_launch_configuration" "explorer" {
   image_id                    = data.aws_ami.explorer.id
   instance_type               = var.instance_type
   security_groups             = [aws_security_group.app.id]
-  key_name                    = var.key_name
+  key_name                    = aws_key_pair.blockscout.key_name
   iam_instance_profile        = aws_iam_instance_profile.explorer.id
   associate_public_ip_address = false
 
