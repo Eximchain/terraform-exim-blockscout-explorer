@@ -2,8 +2,7 @@ module "main_network_node" {
   source = "github.com/eximchain/terraform-aws-eximchain-node.git//terraform/modules/eximchain-node"
 
   aws_region         = var.aws_region
-  #availability_zones = [var.node_availability_zone] // TODO: pass as var
-  availability_zones = ["us-east-1a"]
+  availability_zones = [var.eximchain_node_availability_zone]
 
   node_count   = 1
   archive_mode = true
@@ -16,11 +15,8 @@ module "main_network_node" {
   cert_owner    = "$USER"
   cert_org_name = "Eximchain Pte. Ltd."
 
-  # TODO: Pass as vars
-  #eximchain_node_ami           = var.eximchain_node_ami
-  #eximchain_node_instance_type = var.eximchain_node_instance_type
-  eximchain_node_ami           = "ami-0ec447801a90a989a"
-  eximchain_node_instance_type = "m5.large"
+  eximchain_node_ami           = var.eximchain_node_ami
+  eximchain_node_instance_type = var.eximchain_node_instance_type
 
   aws_vpc = aws_vpc.vpc.id
 
@@ -40,5 +36,5 @@ module "main_network_node" {
 
   node_volume_size = 200
 
-  force_destroy_s3_bucket = true // TODO make var
+  force_destroy_s3_bucket = true
 }

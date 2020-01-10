@@ -34,6 +34,20 @@ variable "root_domain" {
   default     = ""
 }
 
+variable "eximchain_node_ami" {
+  description = "AMI ID to use for eximchain node. If not set, will retrieve the latest version from Eximchain."
+  default     = ""
+}
+
+variable "eximchain_node_instance_type" {
+  description = "The EC2 instance type to use for transaction executor nodes"
+  default     = "t2.medium"
+}
+
+variable "eximchain_node_availability_zone" {
+  description = "AWS availability zone to launch the eximchain node in"
+}
+
 variable "prefix" {
 }
 
