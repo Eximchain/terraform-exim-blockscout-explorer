@@ -5,7 +5,8 @@ module "main_network_node" {
   #availability_zones = [var.node_availability_zone] // TODO: pass as var
   availability_zones = ["us-east-1a"]
 
-  node_count = 1
+  node_count   = 1
+  archive_mode = true
 
   create_load_balancer       = true
   use_internal_load_balancer = true
@@ -18,7 +19,7 @@ module "main_network_node" {
   # TODO: Pass as vars
   #eximchain_node_ami           = var.eximchain_node_ami
   #eximchain_node_instance_type = var.eximchain_node_instance_type
-  eximchain_node_ami           = "ami-0c7e2e40637adb0a5"
+  eximchain_node_ami           = "ami-0ec447801a90a989a"
   eximchain_node_instance_type = "m5.large"
 
   aws_vpc = aws_vpc.vpc.id
