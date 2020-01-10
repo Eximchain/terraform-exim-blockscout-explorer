@@ -24,6 +24,16 @@ variable "public_key" {
   default     = ""
 }
 
+variable "subdomain_names" {
+  description = "The [value] in the final '[value].[root_domain]' DNS name for each chain."
+  default     = {}
+}
+
+variable "root_domain" {
+  description = "The [root_domain] in the final '[value].[root_domain]' DNS name, should end in a TLD (e.g. eximchain.com)."
+  default     = ""
+}
+
 variable "prefix" {
 }
 

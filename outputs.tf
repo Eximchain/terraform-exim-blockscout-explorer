@@ -1,3 +1,7 @@
+output "explorer_dns" {
+    value = local.custom_domains
+}
+
 output "main_network_node_dns" {
   value = module.main_network_node.eximchain_node_dns
 }
