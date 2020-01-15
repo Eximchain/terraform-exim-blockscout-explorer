@@ -17,7 +17,7 @@ resource "aws_codedeploy_deployment_group" "explorer" {
   app_name              = aws_codedeploy_app.explorer.name
   deployment_group_name = "${var.prefix}-explorer-dg${count.index}"
   service_role_arn      = aws_iam_role.deployer.arn
-  autoscaling_groups    = [aws_autoscaling_group.explorer[count.index].name]
+  autoscaling_groups    = [aws_autoscaling_group.explorer_a[count.index].name]
 
   deployment_style {
     deployment_option = "WITH_TRAFFIC_CONTROL"
@@ -32,17 +32,15 @@ resource "aws_codedeploy_deployment_group" "explorer" {
 
   blue_green_deployment_config {
     deployment_ready_option {
-      action_on_timeout    = "STOP_DEPLOYMENT"
-      wait_time_in_minutes = 30
+      action_on_timeout    = "CONTINUE_DEPLOYMENT"
     }
 
     green_fleet_provisioning_option {
-      action = "COPY_AUTO_SCALING_GROUP"
+      action = "DISCOVER_EXISTING"
     }
 
     terminate_blue_instances_on_deployment_success {
-      action                           = "TERMINATE"
-      termination_wait_time_in_minutes = 15
+      action                           = "KEEP_ALIVE"
     }
   }
 }

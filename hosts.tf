@@ -41,9 +41,9 @@ resource "aws_placement_group" "explorer" {
   strategy = "cluster"
 }
 
-resource "aws_autoscaling_group" "explorer" {
+resource "aws_autoscaling_group" "explorer_a" {
   count                = length(var.chains)
-  name                 = "${var.prefix}-${var.chains[count.index]}-asg"
+  name                 = "${var.prefix}-${var.chains[count.index]}-asg-a"
   max_size             = "4"
   min_size             = "1"
   desired_capacity     = "1"
@@ -98,22 +98,60 @@ resource "aws_autoscaling_group" "explorer" {
   }
 }
 
-# TODO: These autoscaling policies are not currently wired up to any triggers
-resource "aws_autoscaling_policy" "explorer-up" {
-  count                  = length(var.chains)
-  name                   = "${var.prefix}-${var.chains[count.index]}-explorer-autoscaling-policy-up"
-  autoscaling_group_name = aws_autoscaling_group.explorer[count.index].name
-  adjustment_type        = "ChangeInCapacity"
-  scaling_adjustment     = 1
-  cooldown               = 300
-}
+resource "aws_autoscaling_group" "explorer_b" {
+  count                = length(var.chains)
+  name                 = "${var.prefix}-${var.chains[count.index]}-asg-b"
+  max_size             = "4"
+  min_size             = "1"
+  desired_capacity     = "1"
+  launch_configuration = aws_launch_configuration.explorer.name
+  vpc_zone_identifier  = [aws_subnet.default.id]
+  target_group_arns    = [aws_lb_target_group.explorer[0].arn]
+  placement_group      = var.use_placement_group[var.chains[count.index]] == "True" ? "${var.prefix}-${var.chains[count.index]}-explorer-pg" : null
 
-resource "aws_autoscaling_policy" "explorer-down" {
-  count                  = length(var.chains)
-  name                   = "${var.prefix}-${var.chains[count.index]}-explorer-autoscaling-policy-down"
-  autoscaling_group_name = aws_autoscaling_group.explorer[count.index].name
-  adjustment_type        = "ChangeInCapacity"
-  scaling_adjustment     = -1
-  cooldown               = 300
+  # Health checks are performed by CodeDeploy hooks
+  health_check_type = "EC2"
+
+  enabled_metrics = [
+    "GroupMinSize",
+    "GroupMaxSize",
+    "GroupDesiredCapacity",
+    "GroupInServiceInstances",
+    "GroupTotalInstances",
+  ]
+
+  depends_on = [
+    aws_ssm_parameter.db_host,
+    aws_ssm_parameter.db_name,
+    aws_ssm_parameter.db_port,
+    aws_ssm_parameter.db_username,
+    aws_ssm_parameter.db_password,
+    aws_ssm_parameter.elixir_version,
+    aws_ssm_parameter.secret_key_base,
+    aws_ssm_parameter.jsonrpc_url,
+    aws_placement_group.explorer
+  ]
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tag {
+    key                 = "prefix"
+    value               = var.prefix
+    propagate_at_launch = true
+  }
+
+  tag {
+    key                 = "chain"
+    value               = var.chains[count.index]
+    propagate_at_launch = true
+  }
+
+  tag {
+    key                 = "Name"
+    value               = "${var.chains[count.index]} Application"
+    propagate_at_launch = true
+  }
 }
 
