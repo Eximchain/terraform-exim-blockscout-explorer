@@ -95,10 +95,13 @@ def wait_for_b_fleet_launch(asg_name):
         response = autoscaling.describe_auto_scaling_groups(AutoScalingGroupNames=[asg_name])
         instances = response['AutoScalingGroups'][0]['Instances']
         num_instances = len(instances)
+        instance_state = instances[0]['LifecycleState'] if num_instances > 0 else None
 
         if num_instances == 0:
             print(f'ASG {asg_name} still launching instance, sleeping {POLL_SLEEP_SECONDS} before retrying.')
             time.sleep(POLL_SLEEP_SECONDS)
+        elif instance_state != 'InService':
+            print(f'Instance found in ASG {asg_name}, but state is {instance_state}. Sleeping {POLL_SLEEP_SECONDS} before retrying.')
         else:
             print(f'ASG {asg_name} successfully launched {num_instances} instance')
             return
