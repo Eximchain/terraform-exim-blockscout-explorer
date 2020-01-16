@@ -44,9 +44,9 @@ resource "aws_placement_group" "explorer" {
 resource "aws_autoscaling_group" "explorer_a" {
   count                = length(var.chains)
   name                 = "${var.prefix}-${var.chains[count.index]}-asg-a"
-  max_size             = "4"
-  min_size             = "1"
-  desired_capacity     = "1"
+  max_size             = 4
+  min_size             = 1
+  desired_capacity     = 1
   launch_configuration = aws_launch_configuration.explorer.name
   vpc_zone_identifier  = [aws_subnet.default.id]
   target_group_arns    = [aws_lb_target_group.explorer[0].arn]
@@ -101,9 +101,9 @@ resource "aws_autoscaling_group" "explorer_a" {
 resource "aws_autoscaling_group" "explorer_b" {
   count                = length(var.chains)
   name                 = "${var.prefix}-${var.chains[count.index]}-asg-b"
-  max_size             = "4"
-  min_size             = "1"
-  desired_capacity     = "1"
+  max_size             = 1
+  min_size             = 0
+  desired_capacity     = 0
   launch_configuration = aws_launch_configuration.explorer.name
   vpc_zone_identifier  = [aws_subnet.default.id]
   target_group_arns    = [aws_lb_target_group.explorer[0].arn]

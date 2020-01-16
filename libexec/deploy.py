@@ -22,6 +22,7 @@ except ImportError:
 
 codedeploy = boto3.client('codedeploy')
 s3 = boto3.resource('s3')
+autoscaling = boto3.client('autoscaling')
 
 # Main Flow
 
@@ -48,15 +49,17 @@ def run(args):
     if asg_flag == 'a':
         a_fleet = current_asg
         b_fleet = other_asg
-        prepare_b_fleet() # TODO
+        prepare_b_fleet(b_fleet)
         release_upload = push_release(application_name, blockscout_source_dir, blockscout_ignore_hidden_files, revision_bucket, blockscout_revision_key)
+        wait_for_b_fleet_launch(b_fleet)
         print("Deploying to fleet B")
         deployment_id_b = deploy_to_target(b_fleet, application_name, deployment_group_name, release_upload)
         wait_for_deploy(deployment_id_b)
         print("Deploying back to fleet A")
         deployment_id_a = deploy_to_target(a_fleet, application_name, deployment_group_name, release_upload)
         wait_for_deploy(deployment_id_a)
-        spin_down_b_fleet() # TODO
+        spin_down_b_fleet(b_fleet)
+        wait_for_b_fleet_spin_down(b_fleet)
     elif asg_flag == 'b':
         print("Fleet B is active. Deploying back to fleet A")
         a_fleet = other_asg
@@ -65,7 +68,8 @@ def run(args):
         release_upload = s3.Object(location['bucket'], location['key'])
         deployment_id_a = deploy_to_target(a_fleet, application_name, deployment_group_name, release_upload)
         wait_for_deploy(deployment_id_a)
-        spin_down_b_fleet() # TODO
+        spin_down_b_fleet(b_fleet)
+        wait_for_b_fleet_spin_down(b_fleet)
     else:
         raise RuntimeError(f'Current ASG {current_asg} must end in "a" or "b"')
 
@@ -81,11 +85,41 @@ def push_release(app_name, blockscout_source_dir, blockscout_ignore_hidden_files
         except Exception as e:
             raise RuntimeError("Error pushing release: ", e)
 
-def prepare_b_fleet():
+def prepare_b_fleet(asg_name):
     print("Preparing fleet B")
+    autoscaling.set_desired_capacity(AutoScalingGroupName=asg_name, DesiredCapacity=1)
 
-def spin_down_b_fleet():
+def wait_for_b_fleet_launch(asg_name):
+    print("Waiting for fleet B")
+    while True:
+        response = autoscaling.describe_auto_scaling_groups(AutoScalingGroupNames=[asg_name])
+        instances = response['AutoScalingGroups'][0]['Instances']
+        num_instances = len(instances)
+
+        if num_instances == 0:
+            print(f'ASG {asg_name} still launching instance, sleeping {POLL_SLEEP_SECONDS} before retrying.')
+            time.sleep(POLL_SLEEP_SECONDS)
+        else:
+            print(f'ASG {asg_name} successfully launched {num_instances} instance')
+            return
+
+def spin_down_b_fleet(asg_name):
     print("Spinning Down fleet B")
+    autoscaling.set_desired_capacity(AutoScalingGroupName=asg_name, DesiredCapacity=0)
+
+def wait_for_b_fleet_spin_down(asg_name):
+    print("Waiting for fleet B")
+    while True:
+        response = autoscaling.describe_auto_scaling_groups(AutoScalingGroupNames=[asg_name])
+        instances = response['AutoScalingGroups'][0]['Instances']
+        num_instances = len(instances)
+
+        if num_instances != 0:
+            print(f'ASG {asg_name} still destroying instance, sleeping {POLL_SLEEP_SECONDS} before retrying.')
+            time.sleep(POLL_SLEEP_SECONDS)
+        else:
+            print(f'ASG {asg_name} successfully destroyed {num_instances} instance')
+            return
 
 def deploy_to_target(target_asg, application_name, deployment_group_name, release):
     revision = {
